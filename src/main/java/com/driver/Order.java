@@ -11,10 +11,19 @@ public class Order {
         if(deliveryTime != null) {
             String[] time = deliveryTime.split(":");
             if(time.length == 2) {
-                int hour = Integer.parseInt(time[0]);
-                int minutes = Integer.parseInt(time[1]);
-                this.deliveryTime = hour * 60 + minutes;
+                try {
+                    int hour = Integer.parseInt(time[0]);
+                    int minutes = Integer.parseInt(time[1]);
+                    this.deliveryTime = hour * 60 + minutes;
+                } catch(NumberFormatException e) {
+                    // Default to 0 if parsing fails
+                    this.deliveryTime = 0;
+                }
+            } else {
+                this.deliveryTime = 0;
             }
+        } else {
+            this.deliveryTime = 0;
         }
     }
 

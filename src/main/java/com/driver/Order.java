@@ -1,19 +1,40 @@
 package com.driver;
 
 public class Order {
+    private String orderId;
+    private String deliveryTime;
+    private String partnerId;
 
-    private String id;
-    private int deliveryTime;
-
-    public Order(String id, String deliveryTime) {
-
-        // The deliveryTime has to converted from string to int and then stored in the attribute
-        //deliveryTime  = HH*60 + MM
+    public Order() {
     }
 
-    public String getId() {
-        return id;
+    public Order(String orderId, String deliveryTime) {
+        this.orderId = orderId;
+        this.deliveryTime = deliveryTime;
+        this.partnerId = null;
     }
 
-    public int getDeliveryTime() {return deliveryTime;}
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getDeliveryTime() {
+        return deliveryTime;
+    }
+
+    public void setDeliveryTime(String deliveryTime) {
+        this.deliveryTime = deliveryTime;
+    }
+
+    public String getPartnerId() {
+        return partnerId;
+    }
+
+    public void setPartnerId(String partnerId) {
+        this.partnerId = partnerId;
+    }
 }

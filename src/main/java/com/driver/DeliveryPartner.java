@@ -1,47 +1,24 @@
 package com.driver;
 
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class DeliveryPartner {
-    private String partnerId;
-    private List<String> orders;
 
-    public DeliveryPartner() {
-        this.orders = new ArrayList<>();
+    private String id;
+    private int numberOfOrders;
+
+    public DeliveryPartner(String id) {
+        this.id = id;
+        this.numberOfOrders = 0;
     }
 
-    public DeliveryPartner(String partnerId) {
-        this.partnerId = partnerId;
-        this.orders = new ArrayList<>();
+    public String getId() {
+        return id;
     }
 
-    public String getPartnerId() {
-        return partnerId;
+    public Integer getNumberOfOrders(){
+        return numberOfOrders;
     }
 
-    public void setPartnerId(String partnerId) {
-        this.partnerId = partnerId;
-    }
-
-    public List<String> getOrders() {
-        return orders;
-    }
-
-    public void setOrders(List<String> orders) {
-        this.orders = orders;
-    }
-
-    public void addOrder(String orderId) {
-        this.orders.add(orderId);
-    }
-
-    public void removeOrder(String orderId) {
-        this.orders.remove(orderId);
-    }
-
-    public int getNumberOfOrders() {
-        return this.orders.size();
+    public void setNumberOfOrders(Integer numberOfOrders) {
+        this.numberOfOrders = numberOfOrders;
     }
 }

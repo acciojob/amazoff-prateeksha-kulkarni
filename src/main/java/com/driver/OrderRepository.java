@@ -19,16 +19,20 @@ public class OrderRepository {
     }
 
     public void saveOrder(Order order) {
-        orderMap.put(order.getId(), order);
+        if (order != null && order.getId() != null) {
+            orderMap.put(order.getId(), order);
+        }
     }
 
     public void savePartner(String partnerId) {
-        DeliveryPartner partner = new DeliveryPartner(partnerId);
-        partnerMap.put(partnerId, partner);
+        if (partnerId != null) {
+            DeliveryPartner partner = new DeliveryPartner(partnerId);
+            partnerMap.put(partnerId, partner);
+        }
     }
 
     public void saveOrderPartnerMap(String orderId, String partnerId) {
-        if (orderMap.containsKey(orderId) && partnerMap.containsKey(partnerId)) {
+        if (orderId != null && partnerId != null && orderMap.containsKey(orderId) && partnerMap.containsKey(partnerId)) {
             // Add order to partner's order list
             HashSet<String> orders = partnerToOrderMap.getOrDefault(partnerId, new HashSet<>());
             orders.add(orderId);
@@ -39,29 +43,38 @@ public class OrderRepository {
 
             // Update partner's order count
             DeliveryPartner partner = partnerMap.get(partnerId);
-            partner.setNumberOfOrders(partner.getNumberOfOrders() + 1);
+            if (partner != null) {
+                partner.setNumberOfOrders(partner.getNumberOfOrders() + 1);
+            }
         }
     }
 
     public Order findOrderById(String orderId) {
+        if (orderId == null) return null;
         return orderMap.getOrDefault(orderId, null);
     }
 
     public DeliveryPartner findPartnerById(String partnerId) {
+        if (partnerId == null) return null;
         return partnerMap.getOrDefault(partnerId, null);
     }
 
     public Integer findOrderCountByPartnerId(String partnerId) {
-        if (partnerMap.containsKey(partnerId)) {
-            return partnerMap.get(partnerId).getNumberOfOrders();
-        }
-        return 0;
+        if (partnerId == null) return 0;
+
+        DeliveryPartner partner = partnerMap.get(partnerId);
+        if (partner == null) return 0;
+
+        return partner.getNumberOfOrders();
     }
 
     public List<String> findOrdersByPartnerId(String partnerId) {
         List<String> orders = new ArrayList<>();
-        if (partnerToOrderMap.containsKey(partnerId)) {
-            orders.addAll(partnerToOrderMap.get(partnerId));
+        if (partnerId != null && partnerToOrderMap.containsKey(partnerId)) {
+            HashSet<String> orderSet = partnerToOrderMap.get(partnerId);
+            if (orderSet != null) {
+                orders.addAll(orderSet);
+            }
         }
         return orders;
     }
@@ -71,42 +84,50 @@ public class OrderRepository {
     }
 
     public void deletePartner(String partnerId) {
-        if (partnerMap.containsKey(partnerId)) {
-            // Get all orders assigned to this partner
-            HashSet<String> orders = partnerToOrderMap.getOrDefault(partnerId, new HashSet<>());
+        if (partnerId == null) return;
 
-            // Remove the partner-order mapping for these orders
-            for (String orderId : orders) {
+        // Get all orders assigned to this partner
+        HashSet<String> orders = partnerToOrderMap.getOrDefault(partnerId, new HashSet<>());
+
+        // Remove the partner-order mapping for these orders
+        for (String orderId : orders) {
+            if (orderId != null) {
                 orderToPartnerMap.remove(orderId);
             }
-
-            // Remove the partner from maps
-            partnerToOrderMap.remove(partnerId);
-            partnerMap.remove(partnerId);
         }
+
+        // Remove the partner from maps
+        partnerToOrderMap.remove(partnerId);
+        partnerMap.remove(partnerId);
     }
 
     public void deleteOrder(String orderId) {
-        if (orderMap.containsKey(orderId)) {
-            // Check if order is assigned to any partner
-            if (orderToPartnerMap.containsKey(orderId)) {
-                String partnerId = orderToPartnerMap.get(orderId);
+        if (orderId == null) return;
 
+        // Check if order is assigned to any partner
+        if (orderToPartnerMap.containsKey(orderId)) {
+            String partnerId = orderToPartnerMap.get(orderId);
+
+            if (partnerId != null && partnerToOrderMap.containsKey(partnerId)) {
                 // Remove order from partner's order list
                 HashSet<String> orders = partnerToOrderMap.get(partnerId);
-                orders.remove(orderId);
+                if (orders != null) {
+                    orders.remove(orderId);
+                }
 
                 // Update partner's order count
                 DeliveryPartner partner = partnerMap.get(partnerId);
-                partner.setNumberOfOrders(partner.getNumberOfOrders() - 1);
-
-                // Remove order-partner mapping
-                orderToPartnerMap.remove(orderId);
+                if (partner != null) {
+                    partner.setNumberOfOrders(Math.max(0, partner.getNumberOfOrders() - 1));
+                }
             }
 
-            // Remove order from orderMap
-            orderMap.remove(orderId);
+            // Remove order-partner mapping
+            orderToPartnerMap.remove(orderId);
         }
+
+        // Remove order from orderMap
+        orderMap.remove(orderId);
     }
 
     public Integer findCountOfUnassignedOrders() {
@@ -114,16 +135,30 @@ public class OrderRepository {
     }
 
     public Integer findOrdersLeftAfterGivenTimeByPartnerId(String timeString, String partnerId) {
+        if (timeString == null || partnerId == null) return 0;
+
         // Convert given time to minutes
-        String[] time = timeString.split(":");
-        int givenTime = Integer.parseInt(time[0]) * 60 + Integer.parseInt(time[1]);
+        int givenTime;
+        try {
+            String[] time = timeString.split(":");
+            if (time.length != 2) return 0;
+
+            givenTime = Integer.parseInt(time[0]) * 60 + Integer.parseInt(time[1]);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            return 0;
+        }
 
         int count = 0;
         if (partnerToOrderMap.containsKey(partnerId)) {
-            for (String orderId : partnerToOrderMap.get(partnerId)) {
-                Order order = orderMap.get(orderId);
-                if (order.getDeliveryTime() > givenTime) {
-                    count++;
+            HashSet<String> orderSet = partnerToOrderMap.get(partnerId);
+            if (orderSet != null) {
+                for (String orderId : orderSet) {
+                    if (orderId != null) {
+                        Order order = orderMap.get(orderId);
+                        if (order != null && order.getDeliveryTime() > givenTime) {
+                            count++;
+                        }
+                    }
                 }
             }
         }
@@ -131,12 +166,21 @@ public class OrderRepository {
     }
 
     public String findLastDeliveryTimeByPartnerId(String partnerId) {
+        if (partnerId == null) return "00:00";
+
         int latestTime = 0;
 
         if (partnerToOrderMap.containsKey(partnerId)) {
-            for (String orderId : partnerToOrderMap.get(partnerId)) {
-                Order order = orderMap.get(orderId);
-                latestTime = Math.max(latestTime, order.getDeliveryTime());
+            HashSet<String> orderSet = partnerToOrderMap.get(partnerId);
+            if (orderSet != null) {
+                for (String orderId : orderSet) {
+                    if (orderId != null) {
+                        Order order = orderMap.get(orderId);
+                        if (order != null) {
+                            latestTime = Math.max(latestTime, order.getDeliveryTime());
+                        }
+                    }
+                }
             }
         }
 

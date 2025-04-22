@@ -1,27 +1,26 @@
 package com.driver;
 
 public class Order {
-    private int timeInMinutes;
-    private String orderId;
+    private String id;
+    private int deliveryTime;
 
-    public Order(String orderId, String deliveryTime) {
-        this.orderId = orderId;
-        this.timeInMinutes = parseDeliveryTime(deliveryTime);
+    public Order(String id, String deliveryTime) {
+        this.id = id;
+        this.deliveryTime = convertDeliveryTimeToMinutes(deliveryTime);
     }
 
-    private int parseDeliveryTime(String timeString) {
-        String[] hourAndMinute = timeString.split(":");
-        int hourComponent = Integer.parseInt(hourAndMinute[0]);
-        int minuteComponent = Integer.parseInt(hourAndMinute[1]);
-
-        return hourComponent * 60 + minuteComponent;
+    private int convertDeliveryTimeToMinutes(String time) {
+        String[] timeParts = time.split(":");
+        int hours = Integer.parseInt(timeParts[0]);
+        int minutes = Integer.parseInt(timeParts[1]);
+        return hours * 60 + minutes;
     }
 
     public String getId() {
-        return orderId;
+        return id;
     }
 
     public int getDeliveryTime() {
-        return timeInMinutes;
+        return deliveryTime;
     }
 }

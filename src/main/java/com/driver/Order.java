@@ -8,8 +8,10 @@ public class Order {
     private String id;
     private int deliveryTime;
 
-    public Order(String id, String deliveryTime) {
-        this.deliveryTime=delivery(deliveryTime);
+    public Order(String orderId, String time) {
+        this.id=id;
+
+        this.deliveryTime=convertTimeToMinutes(time);
 
     }
 
@@ -19,15 +21,13 @@ public class Order {
 
     public int getDeliveryTime() {return deliveryTime;}
 
-    private  int delivery(String deliveryTime){
-        List<String>list = Arrays.asList(deliveryTime.split(":"));
-        int HH = Integer.parseInt(list.get(0));
-        int MM = Integer.parseInt(list.get(1));
-        return HH * 60 + MM;
+    private  int convertTimeToMinutes(String timeStr){
+        int colonIndex = timeStr.indexOf(':');
+        int hours = Integer.parseInt(timeStr.substring(0, colonIndex));
+        int minutes = Integer.parseInt(timeStr.substring(colonIndex + 1));
+        return hours * 60 + minutes;
     }
 
 
-    public void setDeliveryTime(int deliveryTime) {
-        this.deliveryTime = deliveryTime;
-    }
+
 }
